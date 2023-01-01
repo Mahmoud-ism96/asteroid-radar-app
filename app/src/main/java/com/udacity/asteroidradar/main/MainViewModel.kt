@@ -1,34 +1,36 @@
 package com.udacity.asteroidradar.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.network.AsteroidApi
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import android.app.Application
+import androidx.lifecycle.*
+import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.repository.AsteroidRepository
+import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _response = MutableLiveData<String>()
+    private val database = getDatabase(application)
 
-    val response: LiveData<String>
-        get() = _response
+    private val asteroidRepository = AsteroidRepository(database)
+
+    val asteroidList = asteroidRepository.asteroids
 
     init {
-        getAsteroidProperties()
+        viewModelScope.launch { asteroidRepository.refreshAsteroids() }
     }
 
-    private fun getAsteroidProperties() {
-        AsteroidApi.retrofitService.getProperties().enqueue( object: Callback<List<Asteroid>> {
-            override fun onFailure(call: Call<List<Asteroid>>, t: Throwable) {
-                _response.value = "Failure: " + t.message
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(app) as T
             }
-
-            override fun onResponse(call: Call<List<Asteroid>>, response: Response<List<Asteroid>> ) {
-                _response.value = "Success: ${response.body()?.size} Asteroids Retrieved"
-            }
-        })
+            throw IllegalArgumentException("Unable to construct viewmodel")
+        }
     }
+
+//    private suspend fun getAsteroidProperties() {
+//        val asteroids = AsteroidApi.retrofitService.getProperties(Constants.API_KEY)
+//        val result = parseAsteroidsJsonResult(JSONObject(asteroids))
+//        Log.i("MainViewModel Test:", "" + result.toString())
+//    }
 }
