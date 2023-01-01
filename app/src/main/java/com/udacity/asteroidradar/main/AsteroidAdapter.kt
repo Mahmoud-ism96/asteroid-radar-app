@@ -22,6 +22,12 @@ class AsteroidAdapter(private val onClickListener: OnClickListener) :
 
     }
 
+    var asteroids: List<Asteroid> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     class AsteroidViewHolder(private var binding: AsteroidItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(asteroid: Asteroid) {
@@ -44,6 +50,7 @@ class AsteroidAdapter(private val onClickListener: OnClickListener) :
         }
         holder.bind(asteroid)
     }
+
     class OnClickListener(val clickListener: (asteroid: Asteroid) -> Unit) {
         fun onClick(asteroid: Asteroid) = clickListener(asteroid)
     }

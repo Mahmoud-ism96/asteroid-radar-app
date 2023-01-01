@@ -31,7 +31,7 @@ fun List<DatabaseAsteroids>.asDomainModel(): List<Asteroid> {
     }
 }
 
-fun List<Asteroid>.asDatabaseModel(): Array<DatabaseAsteroids> {
+fun ArrayList<Asteroid>.asDatabaseModel(): Array<DatabaseAsteroids> {
     return map {
         DatabaseAsteroids(
             id = it.id,

@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.main
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.repository.AsteroidRepository
 import kotlinx.coroutines.launch
@@ -14,8 +15,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val asteroidList = asteroidRepository.asteroids
 
+    private var _asteroids = MutableLiveData<List<Asteroid>>()
+    val asteroids: LiveData<List<Asteroid>>
+        get() = _asteroids
+
+    private val _navigateToDetailFragment = MutableLiveData<Asteroid>()
+    val navigateToDetailFragment: LiveData<Asteroid>
+        get() = _navigateToDetailFragment
+
+    fun onAsteroidClicked(asteroid: Asteroid) {
+        _navigateToDetailFragment.value = asteroid
+    }
+
+    fun doneNavigating() {
+        _navigateToDetailFragment.value = null
+    }
+
     init {
-        viewModelScope.launch { asteroidRepository.refreshAsteroids() }
+        viewModelScope.launch {
+            try {
+                asteroidRepository.refreshAsteroids()
+            } catch (err: Exception) {
+                println("Error refreshing data: $err")
+            }
+        }
     }
 
     class Factory(val app: Application) : ViewModelProvider.Factory {
@@ -28,9 +51,4 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-//    private suspend fun getAsteroidProperties() {
-//        val asteroids = AsteroidApi.retrofitService.getProperties(Constants.API_KEY)
-//        val result = parseAsteroidsJsonResult(JSONObject(asteroids))
-//        Log.i("MainViewModel Test:", "" + result.toString())
-//    }
 }
