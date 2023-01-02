@@ -1,10 +1,12 @@
 package com.udacity.asteroidradar.main
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.repository.AsteroidRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -13,7 +15,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val asteroidRepository = AsteroidRepository(database)
 
-    val asteroidList = asteroidRepository.asteroids
+    val asteroidRows = asteroidRepository.getRows
+
+
+    suspend fun getAsteroids(): List<Asteroid> {
+        Log.i("Repo:MainView", ""+asteroidRows.value)
+        val list: List<Asteroid> = viewModelScope.async {
+            return@async asteroidRepository.filterSaved()}.await()
+        return list
+    }
 
     private var _asteroids = MutableLiveData<List<Asteroid>>()
     val asteroids: LiveData<List<Asteroid>>

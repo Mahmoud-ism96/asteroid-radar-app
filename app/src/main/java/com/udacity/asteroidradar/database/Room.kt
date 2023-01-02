@@ -3,19 +3,23 @@ package com.udacity.asteroidradar.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.udacity.asteroidradar.Asteroid
 
 @Dao
 interface AsteroidDao {
 
-    @Query("SELECT * FROM databaseasteroids")
-    fun getAsteroids(): LiveData<List<DatabaseAsteroids>>
+    @Query("SELECT * FROM asteroidTable")
+    suspend fun getAsteroids(): List<Asteroid>
+
+    @Query("SELECT COUNT(id) FROM asteroidTable")
+    fun getRows(): LiveData<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg videos: DatabaseAsteroids)
+    suspend fun insertAll(vararg asteroids: Asteroid)
 
 }
 
-@Database(entities = [DatabaseAsteroids::class], version = 1)
+@Database(entities = [Asteroid::class], version = 1)
 abstract class AsteroidDatabase : RoomDatabase() {
     abstract val asteroidDao: AsteroidDao
 }
