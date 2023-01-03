@@ -9,7 +9,10 @@ import com.udacity.asteroidradar.Asteroid
 interface AsteroidDao {
 
     @Query("SELECT * FROM asteroidTable")
-    suspend fun getAsteroids(): List<Asteroid>
+    suspend fun getAllAsteroids(): List<Asteroid>
+
+    @Query("SELECT * FROM asteroidTable")
+    suspend fun getAsteroidsWeek(): List<Asteroid>
 
     @Query("SELECT COUNT(id) FROM asteroidTable")
     fun getRows(): LiveData<Int>

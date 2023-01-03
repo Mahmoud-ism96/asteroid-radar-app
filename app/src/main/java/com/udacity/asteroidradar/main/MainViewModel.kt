@@ -17,6 +17,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val asteroidRows = asteroidRepository.getRows
 
+    var filter = 0
 
     suspend fun getAsteroids(): List<Asteroid> {
         Log.i("Repo:MainView", ""+asteroidRows.value)

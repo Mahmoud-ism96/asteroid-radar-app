@@ -14,7 +14,7 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
 //            it
 //        }
 
-    suspend fun filterSaved() = database.asteroidDao.getAsteroids()
+    suspend fun filterSaved() = database.asteroidDao.getAllAsteroids()
 
     val getRows = database.asteroidDao.getRows()
 
