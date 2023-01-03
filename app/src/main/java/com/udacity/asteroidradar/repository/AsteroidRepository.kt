@@ -15,10 +15,10 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
     suspend fun filterSaved() = database.asteroidDao.getAllAsteroids()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    val startDate = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)
+    val startDate: String = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)
 
     @RequiresApi(Build.VERSION_CODES.O)
-    val endDate = LocalDateTime.now().plusDays(7).format(DateTimeFormatter.ISO_DATE)
+    val endDate: String = LocalDateTime.now().plusDays(7).format(DateTimeFormatter.ISO_DATE)
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun filterWeek() = database.asteroidDao.getAsteroidsWeek(

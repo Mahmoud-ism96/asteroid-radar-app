@@ -30,7 +30,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel.asteroidRows.observe(viewLifecycleOwner, Observer {
             lifecycleScope.launch {
-                adapter.submitList(viewModel.getAsteroids(viewModel.currentFilter.value!!))
+                adapter.submitList(viewModel.getAsteroids())
             }
         })
     }
@@ -48,11 +48,11 @@ class MainFragment : Fragment() {
         })
         binding.asteroidRecycler.adapter = adapter
 
-        viewModel.asteroids.observe(viewLifecycleOwner) { asteroids ->
+        viewModel.currentFilter.observe(viewLifecycleOwner) { asteroids ->
             lifecycleScope.launch {
                 if (asteroids != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        adapter.submitList(viewModel.getAsteroids(viewModel.currentFilter.value!!))
+                        adapter.submitList(viewModel.getAsteroids())
                     }
                 }
             }

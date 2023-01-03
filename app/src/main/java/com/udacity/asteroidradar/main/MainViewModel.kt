@@ -24,13 +24,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateFilter(filter: Int) {
         _currentFilter.value = filter
-        viewModelScope.launch { getAsteroids(filter) }
+        viewModelScope.launch { getAsteroids() }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun getAsteroids(filter: Int): List<Asteroid> {
+    suspend fun getAsteroids(): List<Asteroid> {
         val list: List<Asteroid> = viewModelScope.async {
-            return@async when (filter) {
+            return@async when (_currentFilter.value) {
                 Constants.FILTER_DAY -> asteroidRepository.filterDay()
                 Constants.FILTER_SAVED -> asteroidRepository.filterSaved()
                 else -> asteroidRepository.filterWeek()
@@ -39,9 +39,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return list
     }
 
-    private val _asteroids = MutableLiveData<List<Asteroid>>()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
+//    private val _asteroids = MutableLiveData<List<Asteroid>>()
+//    val asteroids: LiveData<List<Asteroid>>
+//        get() = _asteroids
 
     private val _currentFilter = MutableLiveData<Int>()
     val currentFilter : LiveData<Int> get() = _currentFilter
