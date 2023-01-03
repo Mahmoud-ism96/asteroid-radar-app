@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
@@ -57,6 +58,13 @@ class MainFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.navigateToDetailFragment.observe(viewLifecycleOwner, Observer { asteroid ->
+            if (asteroid != null) {
+                this.findNavController().navigate(MainFragmentDirections.actionShowDetail(asteroid))
+                viewModel.doneNavigating()
+            }
+        })
 
         setHasOptionsMenu(true)
 
