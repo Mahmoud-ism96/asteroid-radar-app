@@ -64,7 +64,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         try {
             val result = AsteroidApi.retrofitService.getPictureOfDay(Constants.API_KEY)
             _pictureOfDay.value = result
-            Log.i("Repo: Image", result.toString())
         } catch (err: Exception) {
             println("Error refreshing picture: $err")
         }

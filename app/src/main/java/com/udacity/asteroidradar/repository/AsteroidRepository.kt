@@ -1,6 +1,5 @@
 package com.udacity.asteroidradar.repository
 
-import android.util.Log
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidDatabase
@@ -17,7 +16,6 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
         try {
             val asteroidList = AsteroidApi.retrofitService.getProperties(Constants.API_KEY)
             val result = parseAsteroidsJsonResult(JSONObject(asteroidList))
-            Log.i("Repo: Inserted", result.toString())
             if (result.isNotEmpty()) {
                 database.asteroidDao.insertAll(*result.toTypedArray())
             } else
