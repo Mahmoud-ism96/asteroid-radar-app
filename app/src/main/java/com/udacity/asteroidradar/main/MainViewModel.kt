@@ -1,7 +1,8 @@
 package com.udacity.asteroidradar.main
 
 import android.app.Application
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
@@ -20,21 +21,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val asteroidRows = asteroidRepository.getRows
 
-    var filter = 0
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateFilter(filter: Int) {
+        _currentFilter.value = filter
+        viewModelScope.launch { getAsteroids(filter) }
+    }
 
-    suspend fun getAsteroids(): List<Asteroid> {
-        Log.i("Repo:MainView", "" + asteroidRows.value)
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getAsteroids(filter: Int): List<Asteroid> {
         val list: List<Asteroid> = viewModelScope.async {
-            return@async asteroidRepository.filterSaved()
+            return@async when (filter) {
+                Constants.FILTER_DAY -> asteroidRepository.filterDay()
+                Constants.FILTER_SAVED -> asteroidRepository.filterSaved()
+                else -> asteroidRepository.filterWeek()
+            }
         }.await()
         return list
     }
 
-    private var _asteroids = MutableLiveData<List<Asteroid>>()
+    private val _asteroids = MutableLiveData<List<Asteroid>>()
     val asteroids: LiveData<List<Asteroid>>
         get() = _asteroids
 
-    private var _pictureOfDay = MutableLiveData<PictureOfDay>()
+    private val _currentFilter = MutableLiveData<Int>()
+    val currentFilter : LiveData<Int> get() = _currentFilter
+
+    private val _pictureOfDay = MutableLiveData<PictureOfDay>()
     val pictureOfDay: LiveData<PictureOfDay> get() = _pictureOfDay
 
     private val _navigateToDetailFragment = MutableLiveData<Asteroid>()
@@ -52,6 +64,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         viewModelScope.launch {
             try {
+                _currentFilter.value = 0
                 asteroidRepository.refreshAsteroids()
                 refreshPictureOfDay()
             } catch (err: Exception) {

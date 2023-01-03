@@ -1,13 +1,15 @@
 package com.udacity.asteroidradar.main
 
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 import kotlinx.coroutines.launch
@@ -23,13 +25,13 @@ class MainFragment : Fragment() {
     }
     lateinit var adapter: AsteroidAdapter
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.asteroidRows.observe(viewLifecycleOwner, Observer {
             lifecycleScope.launch {
-                adapter.submitList(viewModel.getAsteroids())
+                adapter.submitList(viewModel.getAsteroids(viewModel.currentFilter.value!!))
             }
-            Log.i("Repo:",""+viewModel.asteroidRows.value.toString())
         })
     }
 
@@ -47,8 +49,12 @@ class MainFragment : Fragment() {
         binding.asteroidRecycler.adapter = adapter
 
         viewModel.asteroids.observe(viewLifecycleOwner) { asteroids ->
-            if (asteroids != null) {
-                adapter!!.submitList(asteroids)
+            lifecycleScope.launch {
+                if (asteroids != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        adapter.submitList(viewModel.getAsteroids(viewModel.currentFilter.value!!))
+                    }
+                }
             }
         }
 
@@ -62,7 +68,15 @@ class MainFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewModel.updateFilter(
+            when (item.itemId) {
+                R.id.show_today_menu -> Constants.FILTER_DAY
+                R.id.show_saved_menu -> Constants.FILTER_SAVED
+                else -> Constants.FILTER_WEEK
+            }
+        )
         return true
     }
 }

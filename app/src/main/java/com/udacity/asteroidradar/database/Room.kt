@@ -8,11 +8,14 @@ import com.udacity.asteroidradar.Asteroid
 @Dao
 interface AsteroidDao {
 
-    @Query("SELECT * FROM asteroidTable")
+    @Query("SELECT * FROM asteroidTable ORDER BY closeApproachDate ASC")
     suspend fun getAllAsteroids(): List<Asteroid>
 
-    @Query("SELECT * FROM asteroidTable")
-    suspend fun getAsteroidsWeek(): List<Asteroid>
+    @Query("SELECT * FROM asteroidTable WHERE closeApproachDate BETWEEN :startDate AND :endDate ORDER BY closeApproachDate ASC")
+    suspend fun getAsteroidsWeek(startDate: String, endDate: String): List<Asteroid>
+
+    @Query("SELECT * FROM asteroidTable WHERE closeApproachDate = :startDate ORDER BY closeApproachDate ASC")
+    suspend fun getAsteroidsToday(startDate: String): List<Asteroid>
 
     @Query("SELECT COUNT(id) FROM asteroidTable")
     fun getRows(): LiveData<Int>
