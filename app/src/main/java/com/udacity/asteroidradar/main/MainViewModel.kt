@@ -4,7 +4,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.network.AsteroidApi
 import com.udacity.asteroidradar.repository.AsteroidRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -20,15 +23,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var filter = 0
 
     suspend fun getAsteroids(): List<Asteroid> {
-        Log.i("Repo:MainView", ""+asteroidRows.value)
+        Log.i("Repo:MainView", "" + asteroidRows.value)
         val list: List<Asteroid> = viewModelScope.async {
-            return@async asteroidRepository.filterSaved()}.await()
+            return@async asteroidRepository.filterSaved()
+        }.await()
         return list
     }
 
     private var _asteroids = MutableLiveData<List<Asteroid>>()
     val asteroids: LiveData<List<Asteroid>>
         get() = _asteroids
+
+    private var _pictureOfDay = MutableLiveData<PictureOfDay>()
+    val pictureOfDay: LiveData<PictureOfDay> get() = _pictureOfDay
 
     private val _navigateToDetailFragment = MutableLiveData<Asteroid>()
     val navigateToDetailFragment: LiveData<Asteroid>
@@ -46,10 +53,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 asteroidRepository.refreshAsteroids()
+                refreshPictureOfDay()
             } catch (err: Exception) {
                 println("Error refreshing data: $err")
             }
         }
+    }
+
+    private suspend fun refreshPictureOfDay() {
+        try {
+            val result = AsteroidApi.retrofitService.getPictureOfDay(Constants.API_KEY)
+            _pictureOfDay.value = result
+            Log.i("Repo: Image", result.toString())
+        } catch (err: Exception) {
+            println("Error refreshing picture: $err")
+        }
+
     }
 
     class Factory(val app: Application) : ViewModelProvider.Factory {

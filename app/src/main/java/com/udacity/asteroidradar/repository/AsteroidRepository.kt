@@ -9,11 +9,6 @@ import org.json.JSONObject
 
 class AsteroidRepository(private val database: AsteroidDatabase) {
 
-//    val asteroids: List<Asteroid> =
-//        Transformations.map(database.asteroidDao.getAsteroids()) {
-//            it
-//        }
-
     suspend fun filterSaved() = database.asteroidDao.getAllAsteroids()
 
     val getRows = database.asteroidDao.getRows()
@@ -25,14 +20,12 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
             Log.i("Repo: Inserted", result.toString())
             if (result.isNotEmpty()) {
                 database.asteroidDao.insertAll(*result.toTypedArray())
-                Log.i("Repo: Inserted", "Success")
             } else
-                Log.i("Repo: Inserted", "Failed")
+                println("Error Inserting Data")
 
         } catch (err: Exception) {
             println("Error refreshing asteroids: $err")
         }
     }
-
 
 }
