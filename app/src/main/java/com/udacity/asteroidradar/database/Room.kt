@@ -17,6 +17,9 @@ interface AsteroidDao {
     @Query("SELECT * FROM asteroidTable WHERE closeApproachDate = :startDate ORDER BY closeApproachDate ASC")
     suspend fun getAsteroidsToday(startDate: String): List<Asteroid>
 
+    @Query("DELETE FROM asteroidTable WHERE closeApproachDate < :startDate")
+    suspend fun deletePreviousDaysAsteroids(startDate: String): Int
+
     @Query("SELECT COUNT(id) FROM asteroidTable")
     fun getRows(): LiveData<Int>
 

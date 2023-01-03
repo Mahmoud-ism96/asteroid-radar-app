@@ -6,6 +6,8 @@ import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.database.AsteroidDatabase
 import com.udacity.asteroidradar.network.AsteroidApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -42,6 +44,13 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
 
         } catch (err: Exception) {
             println("Error refreshing asteroids: $err")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun deletePreviousDayAsteroids() {
+        withContext(Dispatchers.IO) {
+            database.asteroidDao.deletePreviousDaysAsteroids(startDate)
         }
     }
 
